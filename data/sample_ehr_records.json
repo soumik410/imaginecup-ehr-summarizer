@@ -1,0 +1,38 @@
+[
+  {
+    "id": "patient_001",
+    "age": 65,
+    "gender": "M",
+    "text": "Chief complaint: routine follow-up. PMH: type 2 diabetes, hypertension, obesity. Medications: metformin 1000mg BID, lisinopril 20mg daily, atorvastatin 40mg daily. Allergies: penicillin (anaphylaxis), sulfa drugs (rash). Smoking history: quit 5 years ago. Last A1C: 7.2%. Exam: BP 140/85, HR 72, weight 215 lbs, BMI 32. Plan: continue current medications, routine labs."
+  },
+  {
+    "id": "patient_002",
+    "age": 58,
+    "gender": "F",
+    "text": "Chief complaint: chest pain x2 hours. Onset: acute, substernal, radiating to left arm. Associated symptoms: dyspnea, diaphoresis. PMH: CAD s/p MI 2018, diabetes type 2, hypertension, smoking (current 1 PPD). Medications: aspirin 81mg daily, atorvastatin 40mg, lisinopril 10mg, metoprolol 50mg BID, nitroglycerin PRN. Allergies: latex (anaphylaxis), ibuprofen (GI upset). Vitals: BP 155/92, HR 98, RR 20, O2 sat 96% RA. EKG: normal sinus rhythm, no acute ST changes. Troponin pending."
+  },
+  {
+    "id": "patient_003",
+    "age": 42,
+    "gender": "M",
+    "text": "Chief complaint: shortness of breath x1 week, productive cough. PMH: COPD (GOLD Stage 2), former smoker (quit 8 years ago), hypertension. Medications: albuterol inhaler PRN, tiotropium daily, lisinopril 10mg daily, acetaminophen PRN. Allergies: none documented. Vitals: BP 130/80, HR 88, RR 22, O2 sat 91% on RA. Exam: decreased breath sounds bilaterally, scattered wheezes. CXR: mild hyperinflation, no acute infiltrate. Plan: continue current regimen, monitor O2 saturation."
+  },
+  {
+    "id": "patient_004",
+    "age": 72,
+    "gender": "F",
+    "text": "Chief complaint: dizziness, syncope episode this morning. PMH: atrial fibrillation (on anticoagulation), hypertension, diabetes type 2, prior stroke (2015, recovered). Medications: warfarin 5mg daily (INR therapeutic 2.0-2.5), metoprolol 50mg BID, metformin 500mg BID, lisinopril 20mg daily. Allergies: penicillin, codeine (GI upset). Vitals: BP 145/88, HR 72 (irregular), RR 16, O2 98% RA. Exam: alert, oriented x3, no focal neuro deficits. EKG: atrial fibrillation with RVR. Plan: check INR, review medications, consider cardiology referral."
+  },
+  {
+    "id": "patient_005",
+    "age": 35,
+    "gender": "M",
+    "text": "Chief complaint: fever, sore throat x3 days. Exam: pharyngitis, no exudate, no lymphadenopathy. Rapid strep: negative. Viral culture pending. PMH: asthma (intermittent), seasonal allergies. Medications: albuterol inhaler PRN, loratadine 10mg daily. Allergies: amoxicillin (rash), azithromycin (GI upset). Vitals: BP 120/75, HR 86, RR 16, Temp 101.2F. Plan: supportive care, throat lozenges, return if worsens."
+  },
+  {
+    "id": "patient_006",
+    "age": 55,
+    "gender": "M",
+    "text": "Chief complaint: abdominal pain, nausea x2 days. PMH: diabetes type 2, hypertension, hyperlipidemia, obesity (BMI 34). Medications: metformin 500mg BID, lisinopril 10mg, atorvastatin 20mg, omeprazole 20mg daily. Allergies to NSAIDs (GI bleed history), latex gloves. Vitals: BP 135/88, HR 80, RR 18, Temp 98.6F. Exam: abdomen soft, mild epigastric tenderness, no rebound. Lipase: 185 (normal <200). Ultrasound: fatty infiltration, no gallstones. Assessment: likely gastritis or early pancreatitis."
+  }
+]
