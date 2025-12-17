@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Smart EHR Summarizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>👨‍⚕️ Doctor Portal</h1>
+                <p style="color: var(--text-light); margin-top: 5px;">Manage and review patient health records</p>
+            </div>
+            <div class="user-info">
+                <p>Welcome, <strong id="user-name"></strong></p>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: var(--primary-color);">12</div>
+                <div style="color: var(--text-light); margin-top: 5px;">Patients Under Care</div>
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: var(--success-color);">28</div>
+                <div style="color: var(--text-light); margin-top: 5px;">Summaries Generated</div>
+            </div>
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <div style="font-size: 28px; font-weight: bold; color: var(--warning-color);">3</div>
+                <div style="color: var(--text-light); margin-top: 5px;">High-Risk Alerts</div>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <input type="text" id="search-input" placeholder="Search patients by name or ID..." 
+                   style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 14px;">
+        </div>
+
+        <!-- Patients List -->
+        <div id="patients-container">
+            <h2 style="color: white; margin-bottom: 20px;">📋 Your Patients</h2>
+            <div id="patients-list"></div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alert" class="alert" style="display:none; position: fixed; top: 20px; right: 20px; width: auto; max-width: 400px;"></div>
+    </div>
+
+    <!-- Patient Details Modal -->
+    <div id="patient-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div style="background: white; width: 90%; max-width: 600px; border-radius: 12px; padding: 30px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="modal-title">Patient Details</h2>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">×</button>
+            </div>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8001";
+        const token = localStorage.getItem("token");
+        const userEmail = localStorage.getItem("user_email");
+        const role = localStorage.getItem("role");
+
+        // Check authentication
+        if (!token || role !== "doctor") {
+            window.location.href = "doctor-login.html";
+        }
+
+        // Set user name
+        document.getElementById("user-name").textContent = userEmail.split("@")[0];
+
+        // Load patients on page load
+        loadPatients();
+
+        // Show alert
+        function showAlert(message, type) {
+            const alert = document.getElementById("alert");
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = "block";
+            setTimeout(() => alert.style.display = "none", 5000);
+        }
+
+        // Load patients
+        async function loadPatients() {
+            try {
+                // Sample patient data
+                const patients = [
+                    {
+                        id: 1,
+                        name: "John Smith",
+                        age: 65,
+                        conditions: "Hypertension, Diabetes",
+                        last_visit: "2025-01-15",
+                        risk_level: "high",
+                        summaries_count: 5
+                    },
+                    {
+                        id: 2,
+                        name: "Sarah Johnson",
+                        age: 58,
+                        conditions: "CAD, Hypertension",
+                        last_visit: "2025-01-14",
+                        risk_level: "high",
+                        summaries_count: 3
+                    },
+                    {
+                        id: 3,
+                        name: "Michael Chen",
+                        age: 42,
+                        conditions: "COPD",
+                        last_visit: "2025-01-10",
+                        risk_level: "medium",
+                        summaries_count: 2
+                    },
+                    {
+                        id: 4,
+                        name: "Emma Wilson",
+                        age: 72,
+                        conditions: "Atrial Fibrillation, Stroke History",
+                        last_visit: "2025-01-12",
+                        risk_level: "high",
+                        summaries_count: 4
+                    }
+                ];
+
+                const container = document.getElementById("patients-list");
+                container.innerHTML = patients.map(patient => `
+                    <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 5px;">${patient.name}</h3>
+                            <p style="color: var(--text-light); font-size: 14px; margin-bottom: 8px;">Age: ${patient.age} | ${patient.conditions}</p>
+                            <div style="display: flex; gap: 15px; font-size: 12px; color: var(--text-light);">
+                                <span>Last Visit: ${patient.last_visit}</span>
+                                <span>Summaries: ${patient.summaries_count}</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 10px; ${
+                                patient.risk_level === "high" ? "background: #fee2e2; color: #7f1d1d;" :
+                                patient.risk_level === "medium" ? "background: #fef3c7; color: #78350f;" :
+                                "background: #d1fae5; color: #065f46;"
+                            }">
+                                ${patient.risk_level.toUpperCase()} RISK
+                            </div>
+                            <button class="btn btn-primary" style="width: 150px; padding: 8px;" onclick="viewPatient(${patient.id}, '${patient.name}')">View Records</button>
+                        </div>
+                    </div>
+                `).join("");
+
+            } catch (error) {
+                showAlert("Error loading patients: " + error.message, "error");
+            }
+        }
+
+        // View patient details
+        function viewPatient(patientId, patientName) {
+            const modal = document.getElementById("patient-modal");
+            const modalTitle = document.getElementById("modal-title");
+            const modalContent = document.getElementById("modal-content");
+
+            modalTitle.textContent = `${patientName} - Records`;
+
+            // Sample patient records
+            const records = [
+                {
+                    date: "2025-01-15",
+                    summary: "Routine checkup. Blood pressure elevated at 155/92. Blood glucose 185 mg/dL. A1C trending up slightly.",
+                    medications: ["Metformin 1000mg", "Lisinopril 10mg", "Aspirin 81mg"],
+                    allergies: ["Penicillin"],
+                    risks: ["Hypertension", "Diabetes", "Obesity"]
+                }
+            ];
+
+            modalContent.innerHTML = records.map(record => `
+                <div class="summary-card">
+                    <h3>📋 Visit: ${record.date}</h3>
+                    <div class="summary-text">
+                        <strong>Notes:</strong><br>
+                        ${record.summary}
+                    </div>
+
+                    <div class="entity-section">
+                        <h4>💊 Current Medications</h4>
+                        <div class="entity-list">
+                            ${record.medications.map(med => `<span class="entity-tag medication">${med}</span>`).join("")}
+                        </div>
+                    </div>
+
+                    ${record.allergies.length > 0 ? `
+                        <div class="entity-section">
+                            <h4>⚠️ Allergies</h4>
+                            <div class="entity-list">
+                                ${record.allergies.map(allergy => `<span class="entity-tag allergy">${allergy}</span>`).join("")}
+                            </div>
+                        </div>
+                    ` : ""}
+
+                    <div class="entity-section">
+                        <h4>🚨 Risk Factors</h4>
+                        <div class="entity-list">
+                            ${record.risks.map(risk => `<span class="entity-tag risk">${risk}</span>`).join("")}
+                        </div>
+                    </div>
+                </div>
+            `).join("");
+
+            modal.style.display = "flex";
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById("patient-modal").style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        document.getElementById("patient-modal").addEventListener("click", function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // Logout
+        function logout() {
+            localStorage.clear();
+            window.location.href = "doctor-login.html";
+        }
+    </script>
+</body>
+</html>

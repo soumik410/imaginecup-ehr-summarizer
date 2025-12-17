@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - Smart EHR Summarizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>📋 My Health Records</h1>
+            </div>
+            <div class="user-info">
+                <p>Welcome, <strong id="user-name"></strong></p>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section" onclick="document.getElementById('file-input').click()">
+            <h2>📁 Upload Prescription</h2>
+            <p>Click to upload or drag & drop a prescription file (PDF, JPG, PNG)</p>
+            <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.gif" onchange="handleFileUpload(event)">
+            <button class="btn btn-primary" style="width: 200px;">Choose File</button>
+        </div>
+
+        <!-- Upload Progress -->
+        <div id="upload-progress" style="display:none; margin-bottom: 30px;">
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <p style="margin-bottom: 10px;">Processing your prescription...</p>
+                <div style="width: 100%; background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summaries Section -->
+        <div id="summaries-container">
+            <h2 style="color: white; margin-bottom: 20px;">📊 Your Summaries</h2>
+            <div id="summaries-list"></div>
+        </div>
+
+        <!-- Alert -->
+        <div id="alert" class="alert" style="display:none; position: fixed; top: 20px; right: 20px; width: auto; max-width: 400px;"></div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8001";
+        const token = localStorage.getItem("token");
+        const userEmail = localStorage.getItem("user_email");
+        const role = localStorage.getItem("role");
+
+        // Check authentication
+        if (!token || role !== "patient") {
+            window.location.href = "patient-login.html";
+        }
+
+        // Set user name
+        document.getElementById("user-name").textContent = userEmail.split("@")[0];
+
+        // Load summaries on page load
+        loadSummaries();
+
+        // Show alert
+        function showAlert(message, type) {
+            const alert = document.getElementById("alert");
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = "block";
+            setTimeout(() => alert.style.display = "none", 5000);
+        }
+
+        // Handle file upload
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show progress
+            document.getElementById("upload-progress").style.display = "block";
+            const progressBar = document.getElementById("progress-bar");
+            let progress = 0;
+
+            // Simulate progress
+            const progressInterval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 30, 90);
+                progressBar.style.width = progress + "%";
+            }, 300);
+
+            try {
+                // TODO: Upload file to backend
+                // For now, simulate with sample data
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                clearInterval(progressInterval);
+                progressBar.style.width = "100%";
+
+                showAlert("Prescription processed successfully!", "success");
+
+                // Reload summaries after 1.5 seconds
+                setTimeout(() => {
+                    loadSummaries();
+                    document.getElementById("upload-progress").style.display = "none";
+                }, 1500);
+
+            } catch (error) {
+                clearInterval(progressInterval);
+                showAlert("Error uploading file: " + error.message, "error");
+                document.getElementById("upload-progress").style.display = "none";
+            }
+        }
+
+        // Load summaries from backend
+        async function loadSummaries() {
+            try {
+                // TODO: Fetch from backend /patient/summaries endpoint
+                // For now, show sample data
+
+                const sampleSummaries = [
+                    {
+                        id: 1,
+                        file_name: "prescription_2025_01_15.pdf",
+                        summary: "65-year-old male with multiple cardiovascular risk factors including hypertension, type 2 diabetes, and active smoking status. Currently on metformin and aspirin.",
+                        medications: ["Metformin 1000mg daily", "Aspirin 81mg daily"],
+                        allergies: ["Penicillin (anaphylaxis)"],
+                        risks: ["Hypertension", "Diabetes Type 2", "Active Smoking", "Obesity"],
+                        upload_date: "2025-01-15"
+                    },
+                    {
+                        id: 2,
+                        file_name: "lab_results_2025_01_10.pdf",
+                        summary: "Recent lab work shows A1C at 7.2% and BP 140/85. Cholesterol levels elevated. Recommend lifestyle modifications and medication review.",
+                        medications: ["Lisinopril 10mg daily", "Atorvastatin 20mg daily"],
+                        allergies: [],
+                        risks: ["High Cholesterol", "Hypertension"],
+                        upload_date: "2025-01-10"
+                    }
+                ];
+
+                const container = document.getElementById("summaries-list");
+                if (sampleSummaries.length === 0) {
+                    container.innerHTML = '<p style="color: white; text-align: center;">No summaries yet. Upload a prescription to get started!</p>';
+                    return;
+                }
+
+                container.innerHTML = sampleSummaries.map(summary => `
+                    <div class="summary-card">
+                        <h3>📄 ${summary.file_name}</h3>
+                        <div class="date">Uploaded: ${new Date(summary.upload_date).toLocaleDateString()}</div>
+                        
+                        <div class="summary-text">
+                            <strong>Summary:</strong><br>
+                            ${summary.summary}
+                        </div>
+
+                        ${summary.medications.length > 0 ? `
+                            <div class="entity-section">
+                                <h4>💊 Medications</h4>
+                                <div class="entity-list">
+                                    ${summary.medications.map(med => `<span class="entity-tag medication">${med}</span>`).join("")}
+                                </div>
+                            </div>
+                        ` : ""}
+
+                        ${summary.allergies.length > 0 ? `
+                            <div class="entity-section">
+                                <h4>⚠️ Allergies</h4>
+                                <div class="entity-list">
+                                    ${summary.allergies.map(allergy => `<span class="entity-tag allergy">${allergy}</span>`).join("")}
+                                </div>
+                            </div>
+                        ` : ""}
+
+                        ${summary.risks.length > 0 ? `
+                            <div class="entity-section">
+                                <h4>🚨 Risk Factors</h4>
+                                <div class="entity-list">
+                                    ${summary.risks.map(risk => `<span class="entity-tag risk">${risk}</span>`).join("")}
+                                </div>
+                            </div>
+                        ` : ""}
+                    </div>
+                `).join("");
+
+            } catch (error) {
+                showAlert("Error loading summaries: " + error.message, "error");
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.clear();
+            window.location.href = "patient-login.html";
+        }
+    </script>
+</body>
+</html>

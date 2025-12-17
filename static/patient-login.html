@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart EHR Summarizer - Patient Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="auth-card">
+            <div class="logo-section">
+                <h1>🏥 Smart EHR Summarizer</h1>
+                <p>Patient Portal</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form">
+                <h2>Patient Login</h2>
+                <form onsubmit="handlePatientLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" required placeholder="your.email@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+
+                <p class="auth-switch">
+                    Don't have an account? <a href="#" onclick="showSignup()">Sign Up</a>
+                </p>
+                <p class="role-switch">
+                    Are you a doctor? <a href="doctor-login.html">Doctor Login</a>
+                </p>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-form" style="display:none;">
+                <h2>Create Patient Account</h2>
+                <form onsubmit="handlePatientSignup(event)">
+                    <div class="form-group">
+                        <label for="signup-name">Full Name</label>
+                        <input type="text" id="signup-name" required placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" required placeholder="your.email@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-password">Password (min 8 characters)</label>
+                        <input type="password" id="signup-password" required minlength="8" placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <input type="password" id="signup-confirm" required minlength="8" placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </form>
+
+                <p class="auth-switch">
+                    Already have an account? <a href="#" onclick="showLogin()">Login</a>
+                </p>
+            </div>
+
+            <!-- Alert Messages -->
+            <div id="alert" class="alert" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8001";
+
+        // Toggle between login and signup
+        function showSignup() {
+            document.getElementById("login-form").style.display = "none";
+            document.getElementById("signup-form").style.display = "block";
+        }
+
+        function showLogin() {
+            document.getElementById("signup-form").style.display = "none";
+            document.getElementById("login-form").style.display = "block";
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const alert = document.getElementById("alert");
+            alert.textContent = message;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = "block";
+            setTimeout(() => alert.style.display = "none", 5000);
+        }
+
+        // Patient signup
+        async function handlePatientSignup(event) {
+            event.preventDefault();
+
+            const password = document.getElementById("signup-password").value;
+            const confirm = document.getElementById("signup-confirm").value;
+
+            if (password !== confirm) {
+                showAlert("Passwords do not match!", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: document.getElementById("signup-email").value,
+                        full_name: document.getElementById("signup-name").value,
+                        password: password,
+                        role: "patient"
+                    })
+                });
+
+                if (response.ok) {
+                    showAlert("Account created! Please login.", "success");
+                    setTimeout(() => showLogin(), 2000);
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || "Signup failed", "error");
+                }
+            } catch (error) {
+                showAlert("Network error: " + error.message, "error");
+            }
+        }
+
+        // Patient login
+        async function handlePatientLogin(event) {
+            event.preventDefault();
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: document.getElementById("login-email").value,
+                        password: document.getElementById("login-password").value
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Store token in localStorage
+                    localStorage.setItem("token", data.access_token);
+                    localStorage.setItem("role", data.user.role);
+                    localStorage.setItem("user_id", data.user.id);
+                    localStorage.setItem("user_email", data.user.email);
+
+                    showAlert("Login successful!", "success");
+                    setTimeout(() => window.location.href = "patient-dashboard.html", 1500);
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || "Login failed", "error");
+                }
+            } catch (error) {
+                showAlert("Network error: " + error.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>

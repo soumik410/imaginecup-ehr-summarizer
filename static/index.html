@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart EHR Summarizer - AI-Powered Health Records</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .landing-page {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .landing-header {
+            text-align: center;
+            padding: 80px 20px 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .landing-header h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .landing-header p {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .btn-large {
+            padding: 14px 32px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-large.primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-large.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-large.secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-large.secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        .feature-card .icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="landing-page">
+    <div class="landing-header">
+        <h1>🏥 Smart EHR Summarizer</h1>
+        <p>AI-powered Electronic Health Record analysis. Upload prescriptions, get instant summaries with medication lists, allergy alerts, and risk factors.</p>
+        
+        <div class="cta-buttons">
+            <a href="patient-login.html" class="btn-large primary">👤 Patient Login</a>
+            <a href="doctor-login.html" class="btn-large secondary">👨‍⚕️ Doctor Login</a>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="icon">⚡</div>
+            <h3>Instant Summaries</h3>
+            <p>Get AI-powered health summaries from prescriptions and medical documents in seconds.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">💊</div>
+            <h3>Medication Tracking</h3>
+            <p>Automatically extract and organize all medications from patient records.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">⚠️</div>
+            <h3>Allergy Alerts</h3>
+            <p>Never miss critical allergy information with intelligent allergy detection.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🚨</div>
+            <h3>Risk Detection</h3>
+            <p>Identify health risks and contraindications automatically from patient data.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">👨‍⚕️</div>
+            <h3>Doctor Portal</h3>
+            <p>Doctors can manage multiple patients and access their health summaries securely.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="icon">🔒</div>
+            <h3>Privacy Secured</h3>
+            <p>Enterprise-grade security with encrypted storage and role-based access control.</p>
+        </div>
+    </div>
+</body>
+</html>
