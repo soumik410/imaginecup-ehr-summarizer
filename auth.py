@@ -6,16 +6,18 @@ from datetime import datetime, timedelta
 from typing import Optional
 import jwt
 import os
-from passlib.context import CryptContext
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 from pydantic import BaseModel
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Use Argon2 for password hashing (supports unlimited password length)
+hasher = PasswordHasher()
 
 # JWT configuration
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 480  # 8 hours
+
 
 
 # ============================================================================
@@ -60,13 +62,18 @@ class TokenResponse(BaseModel):
 # ============================================================================
 
 def hash_password(password: str) -> str:
-    """Hash a plain password"""
-    return pwd_context.hash(password)
+    """Hash a plain password using Argon2 (supports unlimited password length)"""
+    return hasher.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify password against hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        hasher.verify(hashed_password, plain_password)
+        return True
+    except VerifyMismatchError:
+        return False
+
 
 
 # ============================================================================
